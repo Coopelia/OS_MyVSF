@@ -13,6 +13,7 @@ public:
 	void setScale(float x);
 	void setName(String s);
 	void setID(int id);
+	bool onCilck(RenderWindow* app, Event& e);
 	void show(RenderWindow* app);
 	FileType type;
 	Sprite sIcon;

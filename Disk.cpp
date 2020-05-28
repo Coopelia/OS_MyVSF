@@ -3,8 +3,6 @@
 Disk::Disk()
 {
 	this->nowPtr = 0;
-	this->maxsize = SIZE;
-	this->restsize = SIZE;
 	this->vhard.resize(SIZE);
 }
 
@@ -30,10 +28,7 @@ int Disk::disk_write(std::string s, int length)
 			vhard[nowPtr++] = '\0';
 	}
 	if (flag)
-	{
-		restsize -= length;
 		return 1;
-	}
 	else
 	{
 		for (int i = temp; i <nowPtr; i++)
@@ -58,15 +53,15 @@ bool Disk::disk_read(std::string& s, int length)
 	return flag;
 }
 
-int Disk::disk_remove(int start, int end)
-{
-	if (start > end || end >= SIZE - 1)
-		return 0;
-	for (int i = start; i <= end; i++)
-		vhard[i] = '\0';
-	restsize += end - start + 1;
-	return 1;
-}
+//int Disk::disk_remove(int start, int end)
+//{
+//	if (start > end || end >= SIZE - 1)
+//		return 0;
+//	for (int i = start; i <= end; i++)
+//		vhard[i] = '\0';
+//	restsize += end - start + 1;
+//	return 1;
+//}
 
 int Disk::disk_next(int flag)
 {
@@ -89,8 +84,6 @@ int Disk::disk_next(int flag)
 void Disk::disk_format()
 {
 	this->nowPtr = 0;
-	this->maxsize = SIZE;
-	this->restsize = SIZE;
 	this->vhard.resize(SIZE);
 }
 

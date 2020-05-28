@@ -12,6 +12,7 @@ public:
 	void sys_start(std::string m_disk);//根据m_disk初始化文件系统
 	void sys_format();//格式化
 	int sys_mkdir(std::string dirname);//在当前目录创建文件夹（1：成功，0：子目录项个数满了，-1：重名，其它：空间不足）
+	void sys_delete(FCB fcb);//删除文件
 	int sys_opendir(FCB fcb);//打开文件夹（1：成功）
 	int sys_closedir();//关闭当前打开文件夹，返回到父目录（1：成功）
 	int sys_mkfile(std::string filename);//在当前目录创建文件（1：成功，0：子目录项个数满了，-1：重名，其它：空间不足）

@@ -43,6 +43,20 @@ void UI_File::setID(int id)
 	this->id = id;
 }
 
+bool UI_File::onCilck(RenderWindow* app, Event& e)
+{
+	FloatRect box = sIcon.getGlobalBounds();
+	if (Mouse::getPosition(*app).x >= box.left && Mouse::getPosition(*app).x <= (box.left + box.width) && Mouse::getPosition(*app).y >= box.top && Mouse::getPosition(*app).y <= (box.top + box.height))
+	{
+		if (e.type == Event::MouseButtonReleased && e.key.code == Mouse::Left)
+			return true;
+		else
+			return false;
+	}
+	else
+		return false;
+}
+
 void UI_File::show(RenderWindow* app)
 {
 	if (this->type == T_DIR)
@@ -58,10 +72,11 @@ void UI_File::show(RenderWindow* app)
 
 UI_path::UI_path()
 {
+	this->bt_pathname.setTextrue("assets/image/path_name.png");
 	this->font.loadFromFile("assets/fonts/fSimpleRound.ttf");
 	this->t.setFont(font);
 	this->t.setFillColor(Color::Black);
-	this->t.setCharacterSize(10);
+	this->t.setCharacterSize(22);
 }
 
 void UI_path::Init(RenderWindow* app)
@@ -78,7 +93,7 @@ void UI_path::setString(String s)
 void UI_path::setPosition(int x, int y)
 {
 	this->bt_pathname.setPosition(x, y);
-	this->t.setPosition(x + 3, y + 2);
+	this->t.setPosition(x + 15, y);
 }
 
 void UI_path::show()

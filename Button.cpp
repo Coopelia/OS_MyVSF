@@ -52,3 +52,8 @@ void Button::show()
 {
 	(*app).draw(s);
 }
+
+void Button::reset()
+{
+	this->s.setColor(Color(255, 255, 255, 255));
+}

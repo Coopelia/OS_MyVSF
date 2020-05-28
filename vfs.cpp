@@ -104,6 +104,7 @@ void MyFSY::sys_start(std::string m_disk)
 		if (res[i] == '\0')
 		{
 			nowDir.fcb.son[k++] = t;
+			if (k == nowDir.fcb.num_son) break;
 			while (i < res.length() && res[i++] == '\0');
 			i--;
 			t = 0;
@@ -114,8 +115,6 @@ void MyFSY::sys_start(std::string m_disk)
 			t += res[i] - '0';
 		}
 	}
-	for (int i = 0; i < nowDir.fcb.num_son; i++)
-		nowDir.fcb.son[i] = nowDir.fcb.son[i];
 }
 
 void MyFSY::sys_format()
@@ -159,7 +158,6 @@ void MyFSY::sys_format()
 	fat2.state[2] = END;
 	fat2.state[3] = 4;
 	fat2.state[4] = END;
-
 	//写入FAT
 	update_fat();
 
@@ -171,6 +169,8 @@ void MyFSY::sys_format()
 		nowDir.fcb.son[i] = nowDir.fcb.son[i];
 
 	//写入根目录fcb
+	fat1.state[nowDir.fcb.first] = END;
+	fat2.state[nowDir.fcb.first] = END;
 	write_fcb(nowDir.fcb);
 }
 
@@ -278,9 +278,6 @@ void MyFSY::write_fcb(FCB fcb)
 			str[i * 4 + j] = res[j];
 	}
 	disk.disk_write(str, SONSIZE);
-
-	fat1.state[fcb.first] = END;
-	fat2.state[fcb.first] = END;
 	update_fat();
 }
 
@@ -339,6 +336,7 @@ void MyFSY::get_fcb(int start, FCB& fcb)
 	res.clear();
 	disk.disk_read(res, SONSIZE);
 	std::string str;
+	int mm = 0;
 	for (int ii = 0; ii < MAXSON; ii++)
 	{
 		str.clear();
@@ -349,7 +347,9 @@ void MyFSY::get_fcb(int start, FCB& fcb)
 		while (str[i])
 			num = num * 10 + (res[i++] - '0');
 		if (num != 0)
-			fcb.son[fcb.num_son++] = num;
+			fcb.son[mm++] = num;
+		if (mm == fcb.num_son)
+			break;
 	}
 }
 
@@ -377,10 +377,42 @@ int MyFSY::sys_mkdir(std::string dirname)
 		return 3; //空间不足分配失败
 	FCB fcb;
 	fcb.Init(dirname, '0', first, FCBSIZE);
+	fat1.state[fcb.first] = END;
+	fat2.state[fcb.first] = END;
 	write_fcb(fcb);
 	nowDir.fcb.son[nowDir.fcb.num_son++] = fcb.first;
 	write_fcb(nowDir.fcb);//更新磁盘的fcb
 	return 1;
+}
+
+void MyFSY::sys_delete(FCB fcb)
+{
+	int n = fcb.first, next;
+	std::string s;
+	bool end = false;
+	while(!end)
+	{
+		if (fat1.state[n] == END)
+			end = true;
+		next = fat1.state[n];
+		disk.disk_move(n);
+		disk.disk_write(s, BLOCKSIZE);
+		fat1.state[n] = FREE;
+		fat2.state[n] = FREE;
+		n = next;
+	}
+	for (int i = 0; i < nowDir.fcb.num_son; i++)
+	{
+		if (fcb.first == nowDir.fcb.son[i])
+		{
+			for (int j = i; j < nowDir.fcb.num_son - 1; j++)
+				nowDir.fcb.son[j] = nowDir.fcb.son[j + 1];
+			nowDir.fcb.num_son--;
+			break;
+		}
+	}
+	write_fcb(nowDir.fcb);
+	update_fat();
 }
 
 int MyFSY::sys_opendir(FCB fcb)
@@ -428,6 +460,8 @@ int MyFSY::sys_mkfile(std::string filename)
 		return 3; //空间不足分配失败
 	FCB fcb;
 	fcb.Init(filename, '1', first, FCBSIZE);
+	fat1.state[fcb.first] = END;
+	fat2.state[fcb.first] = END;
 	write_fcb(fcb);
 	nowDir.fcb.son[nowDir.fcb.num_son++] = fcb.first;
 	write_fcb(nowDir.fcb);//更新磁盘的fcb
@@ -502,24 +536,26 @@ void MyFSY::write_byFAT(unsigned short first, std::string content)
 			disk.disk_move(next); //移动到下一个块
 			disk.disk_write(buf, BLOCKSIZE);//按块写入
 			buf.clear();//清空缓冲
-			if (next != END)
-				next = fat1.state[next];//更新下一个块号
+			if (next == END)
+				break;
+			next = fat1.state[next];//更新下一个块号
 		}
 	}
 }
 
 void MyFSY::read_byFAT(unsigned short first, std::string& content)
 {
+	content.clear();
 	std::string buf;  //缓冲区
 	int next = fat1.state[first]; //第一个块是FCB，下一个就是数据文件
 	while (true)
 	{
+		if (next == END)
+			break;
 		disk.disk_move(next); //移动到下一个块
 		disk.disk_read(buf, BLOCKSIZE);//按块读入
 		content += buf;//从缓冲区写入到content
 		buf.clear();//清空缓冲
-		if (next == END)
-			break;
 		next = fat1.state[next];//更新下一个块号
 	}
 }

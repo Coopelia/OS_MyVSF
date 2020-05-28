@@ -6,6 +6,7 @@ class Button
 public:
 	Button();
 	bool PreBehRel; 
+	void reset();
 	void setTextrue(String s);
 	void setPosition(int x, int y);
 	void setScale(float x, float y);
