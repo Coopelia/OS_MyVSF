@@ -263,21 +263,10 @@ void UIScene::input_writing(Event& e)
 	std::stringstream ss;
 	int i;
 	for (i = 0; i < now_file_content.length(); i++)
-	{
 		ss << now_file_content[i];
-		if (i % 100 == 0 && i != 0)
-			ss << std::endl;
-	}
 	if (e.type == Event::TextEntered)
-	{
 		if (e.text.unicode >= 33 && e.text.unicode <= 126)
-		{
 			ss << static_cast<char>(e.text.unicode);
-			if ((i++) % 100 == 0 && i != 0)
-				ss << std::endl;
-		}
-	}
-	now_file_content.clear();
 	ss >> now_file_content;
 	if (e.type == Event::KeyReleased && e.key.code == Keyboard::BackSpace && now_file_content.length() > 0)
 		now_file_content.pop_back();
