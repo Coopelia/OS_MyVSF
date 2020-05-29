@@ -32,7 +32,7 @@ public:
 	Sprite sBackground, sBg_dir, sBg_txt, sBg_new, sBg_path, sHightLight;
 	Texture tBackground, tBg_dir, tBg_txt, tBg_new, tBg_path, tHightLight;
 	Button bt_ok, bt_cancel, bt_open, bt_close, bt_delete, bt_save, bt_newDir, bt_newTxt, bt_edit;
-	Text txt, tip, tName;
+	Text txt, tip, tName, t_meg;
 	Font font;
 	int core_x, core_y;//文件视图第一个文件的坐标
 	int now_numFile;//当前视图下文件数量

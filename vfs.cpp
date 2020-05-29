@@ -57,12 +57,14 @@ void MyFSY::sys_start(std::string m_disk)
 	ss.clear();
 	res.clear();
 	disk.disk_read(res, TIMESIZE);
-	nowDir.fcb.m_time = atoi(res.substr(6).c_str());
+	for (int i = 0; i < 6; i++)
+		nowDir.fcb.m_time[i] = res[i];
 
 	ss.clear();
 	res.clear();
 	disk.disk_read(res, DATASIZE);
-	nowDir.fcb.m_data = atoi(res.substr(8).c_str());
+	for (int i = 0; i < 8; i++)
+		nowDir.fcb.m_data[i] = res[i];
 
 	//根目录起始盘块号固定，是已知的
 	disk.disk_read(res, FIRSTSIZE);
@@ -231,13 +233,15 @@ void MyFSY::write_fcb(FCB fcb)
 
 	ss.clear();
 	res.clear();
-	ss << fcb.m_time;
+	for (int i = 0; i < 6; i++)
+		ss << fcb.m_time[i];
 	ss >> res;
 	disk.disk_write(res, TIMESIZE);
 
 	ss.clear();
 	res.clear();
-	ss << fcb.m_data;
+	for (int i = 0; i < 8; i++)
+		ss << fcb.m_data[i];
 	ss >> res;
 	disk.disk_write(res, DATASIZE);
 
@@ -299,11 +303,13 @@ void MyFSY::get_fcb(int start, FCB& fcb)
 
 	res.clear();
 	disk.disk_read(res, TIMESIZE);
-	fcb.m_time = atoi(res.substr(0, 6).c_str());
+	for (int i = 0; i < 6; i++)
+		fcb.m_time[i] = res[i];
 
 	res.clear();
 	disk.disk_read(res, DATASIZE);
-	fcb.m_data = atoi(res.substr(0, 8).c_str());
+	for (int i = 0; i < 8; i++)
+		fcb.m_data[i] = res[i];
 
 	res.clear();
 	disk.disk_read(res, FIRSTSIZE);

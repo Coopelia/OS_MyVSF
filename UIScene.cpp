@@ -25,6 +25,10 @@ UIScene::UIScene()
 	tName.setFillColor(Color::Black);
 	tName.setCharacterSize(36);
 	tName.setPosition(340, 338);
+	t_meg.setFont(font);
+	t_meg.setFillColor(Color(125, 125, 125, 255));
+	t_meg.setCharacterSize(20);
+	t_meg.setPosition(40, 688);
 	tHightLight.loadFromFile("assets/image/hl.png");
 	sHightLight.setTexture(tHightLight);
 	tBackground.loadFromFile("assets/image/back.png");
@@ -391,11 +395,17 @@ void UIScene::update_dir()
 	for (int i = 0; i < vfs.nowDir.fcb.num_son; i++)
 	{
 		vfs.get_fcb(vfs.nowDir.fcb.son[i], fcb);
+		std::string str;
+		for (int i = 0; fcb.filename[i] != '\0'; i++)
+			str.push_back(fcb.filename[i]);
 		if (fcb.attribute == '0')
 			now_ls[i].setType(T_DIR);
 		else
+		{
 			now_ls[i].setType(T_FILE);
-		now_ls[i].setName(fcb.filename);
+			str += ".txt";
+		}
+		now_ls[i].setName(str);
 		now_ls[i].id = i;
 		now_ls[i].setScale(ICON_SCALE);
 		now_ls[i].setPosition(core_x + (i % 10) * dx, core_y + (i / 10) * dy);
@@ -409,9 +419,30 @@ void UIScene::update_dir()
 		upath[i].setPosition(i * 100 + 30, 62);
 	}
 	if (id_seleted != -1)
+	{
 		sHightLight.setPosition(core_x + (id_seleted % 10) * dx - 5, core_y + (id_seleted / 10) * dy - 5);
+		vfs.get_fcb(vfs.nowDir.fcb.son[id_seleted], fcb);
+		std::string str;
+		for (int i = 0; i < 8; i++)
+		{
+			str.push_back(fcb.m_data[i]);
+			if (i == 3 || i == 5)
+				str.push_back('/');
+		}
+		str.push_back(' ');
+		for (int i = 0; i < 6; i++)
+		{
+			str.push_back(fcb.m_time[i]);
+			if (i == 1 || i == 3)
+				str.push_back(':');
+		}
+		t_meg.setString(L"选中一个文件 修改日期：" + str);
+	}
 	else
+	{
 		sHightLight.setPosition(-300, -300);
+		t_meg.setString("");
+	}
 }
 
 void UIScene::Update()
@@ -431,6 +462,7 @@ void UIScene::Draw()
 		show_now_file();
 	app->draw(sBg_path);
 	show_button();
+	app->draw(t_meg);
 
 	app->display();
 }
