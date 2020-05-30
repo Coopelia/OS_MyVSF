@@ -8,7 +8,7 @@ Disk::Disk()
 
 Disk::~Disk()
 {
-
+	
 }
 
 int Disk::disk_write(std::string s, int length)

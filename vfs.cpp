@@ -371,7 +371,7 @@ int MyFSY::sys_mkdir(std::string dirname)
 			return -1;
 	}
 	int first = -1;
-	for (int i = 0; i < BLOCKNUM; i++)
+	for (int i = 0; i < BLOCKNUM; i++) //找一个空的盘块
 	{
 		if (fat1.state[i] == FREE)
 		{
@@ -391,7 +391,7 @@ int MyFSY::sys_mkdir(std::string dirname)
 	return 1;
 }
 
-void MyFSY::sys_delete(FCB fcb)
+void MyFSY::sys_delete(FCB fcb) //只删除fcb和更新fat表
 {
 	int n = fcb.first, next;
 	std::string s;

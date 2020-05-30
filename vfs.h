@@ -5,7 +5,7 @@
 #include"Button.h"
 #include"Disk.h"
 
-class MyFSY
+class MyFSY //文件系统类
 {
 public:
 	MyFSY();
